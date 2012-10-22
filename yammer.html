@@ -1,0 +1,29 @@
+<!DOCTYPE HTML> <html> <head></head> <body>
+<script data-app-id="hyB2pTvrL36Y50py8EWj6A" src="https://assets.yammer.com/platform/yam.js"></script>
+<script> yam.connect.embedFeed(
+{ container: '#embedded-feed'
+, network: 'mozilla.com'
+});
+
+function theYamMonitor() {
+  yam.getLoginStatus( function(response) {
+    if (response.authResponse) {
+      navigator.mozSocial.getWorker().port.postMessage(
+        {topic: "yam.currentUser", data: yam.currentUser}
+      );
+    } else {
+      // no user session available, someone you don’t know
+      navigator.mozSocial.getWorker().port.postMessage(
+        {topic: "yam.currentUser", data: {}}
+      );
+    }
+    window.setTimeout(theYamMonitor, 1000);
+  });
+}
+
+window.setTimeout(theYamMonitor, 1000);
+
+</script>
+<div id="embedded-feed"></div>
+</body>
+</html>
