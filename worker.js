@@ -23,15 +23,20 @@ onconnect = function(e) {
     }
     if (msg.topic == "yam.currentUser") {
       // bounce the user data into the socialAPI
-      postAPIMessage('social.user-profile',
+      dump("got a user "+JSON.stringify(msg)+"\n");
+      if (msg.data) {
+	postAPIMessage('social.user-profile',
 		     {
 		      portrait: msg.data.mugshot_url,
 		      userName: msg.data.name,
 		      displayName: msg.data.full_name,
 		      profileURL: msg.data.web_url
 		     });
-      if (msg.data.name) {
-        initializeAmbientNotifications();
+	if (msg.data.name) {
+	  initializeAmbientNotifications();
+	}
+      } else {
+	postAPIMessage('social.user-profile')
       }
     }
 
@@ -40,21 +45,18 @@ onconnect = function(e) {
 
 function initializeAmbientNotifications() {
 
-	postAPIMessage('social.ambient-notification-update',
-		{
-		  name: "private-msg",
-		  counter: 2,
-		  iconURL: 'yammer-dm.png',
-		  contentPanel: "/private_msg.htm"
-	 });
+  postAPIMessage('social.ambient-notification-update', {
+    name: "private-msg",
+    counter: 2,
+    iconURL: 'yammer-dm.png',
+    contentPanel: "/private_msg.htm"
+  });
 
-
-	postAPIMessage('social.ambient-notification-update',
-		{
-		  name: "network-update",
-		  counter: 1,
-		  background: 'yammer-net.png', 
-		  contentPanel: "/network_update.htm"
-	 });
+  postAPIMessage('social.ambient-notification-update', {
+    name: "network-update",
+    counter: 1,
+    background: 'yammer-net.png', 
+    contentPanel: "/network_update.htm"
+  });
 
 }

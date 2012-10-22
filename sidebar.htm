@@ -7,7 +7,7 @@
 
 function theYamMonitor() {
   yam.getLoginStatus( function(response) {
-    if (response.authResponse) {
+    if (response.authResponse || response.success) {
       navigator.mozSocial.getWorker().port.postMessage(
         {topic: "yam.currentUser", data: yam.currentUser}
       );
