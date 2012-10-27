@@ -8,6 +8,7 @@ function postAPIMessage(topic, data) {
 }
 
 onconnect = function(e) {
+  dump("yammerer port onconnect\n");
   var port = e.ports[0];
   port.onmessage = function(e) {
     var msg = e.data;
@@ -23,7 +24,7 @@ onconnect = function(e) {
     }
     if (msg.topic == "yam.currentUser") {
       // bounce the user data into the socialAPI
-      dump("got a user "+JSON.stringify(msg)+"\n");
+      //dump("got a user "+JSON.stringify(msg)+"\n");
       if (msg.data) {
 	postAPIMessage('social.user-profile',
 		     {
@@ -45,18 +46,18 @@ onconnect = function(e) {
 
 function initializeAmbientNotifications() {
 
-  postAPIMessage('social.ambient-notification-update', {
+  postAPIMessage('social.ambient-notification', {
     name: "private-msg",
     counter: 2,
-    iconURL: 'yammer-dm.png',
-    contentPanel: "/private_msg.htm"
+    iconURL: '/yammerer/yammer-dm.png',
+    contentPanel: "/yammerer/private_msg.htm"
   });
 
-  postAPIMessage('social.ambient-notification-update', {
+  postAPIMessage('social.ambient-notification', {
     name: "network-update",
     counter: 1,
-    background: 'yammer-net.png', 
-    contentPanel: "/network_update.htm"
+    background: '/yammerer/yammer-net.png', 
+    contentPanel: "/yammerer/network_update.htm"
   });
 
 }

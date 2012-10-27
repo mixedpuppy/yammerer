@@ -1,27 +1,41 @@
 <!DOCTYPE HTML> <html> <head></head> <body>
-<script data-app-id="hyB2pTvrL36Y50py8EWj6A" src="https://assets.yammer.com/platform/yam.js"></script>
+<script data-app-id="GXdkYWYvuC1lAD8RUESKw" src="https://assets.yammer.com/platform/yam.js"></script>
 <script> yam.connect.embedFeed(
 { container: '#embedded-feed'
-, network: 'mozilla.com'
+, network: 'yammerdevelopersnetwork',
+feedType: 'in_thread', threadId: 227464019
 });
 
+// /api/v1/streams/notifications?count=3&mark_seen=false
+var currentUser = null;
 function theYamMonitor() {
-  yam.getLoginStatus( function(response) {
-    if (response.authResponse || response.success) {
-      navigator.mozSocial.getWorker().port.postMessage(
-        {topic: "yam.currentUser", data: yam.currentUser}
-      );
-    } else {
-      // no user session available, someone you don’t know
+  yam.request({
+    url: "/api/v1/networks/current.json",
+    success: function(resp) {
+      var user = yam.getCurrentUser();
+      if (!currentUser || user.id != currentUser.id) {
+        currentUser = user;
+        //dump("****** getCurrentNetwork "+yam.getCurrentNetwork()+"\n");
+        navigator.mozSocial.getWorker().port.postMessage(
+          {topic: "yam.currentUser", data: user}
+        );
+      }
+    },
+    error: function(resp) {
+      if (resp.status == 429) // not sure what this is, but it is not logged out
+        return;
+      currentUser = null;
       navigator.mozSocial.getWorker().port.postMessage(
         {topic: "yam.currentUser", data: {}}
       );
+    },
+    complete: function(resp) {
+      //dump("****** current "+JSON.stringify(resp)+"\n");
     }
-    window.setTimeout(theYamMonitor, 1000);
   });
 }
 
-window.setTimeout(theYamMonitor, 1000);
+window.setInterval(theYamMonitor, 1000);
 
 </script>
 <div id="embedded-feed"></div>
