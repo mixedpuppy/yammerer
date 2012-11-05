@@ -33,31 +33,25 @@ onconnect = function(e) {
 		      displayName: msg.data.full_name,
 		      profileURL: msg.data.web_url
 		     });
-	if (msg.data.name) {
-	  initializeAmbientNotifications();
-	}
       } else {
 	postAPIMessage('social.user-profile')
       }
     }
+    if (msg.topic == "yam.currentNetwork") {
+      postAPIMessage('social.ambient-notification', {
+	name: "private_unseen_message_count",
+	counter: msg.data.private_unseen_message_count,
+	iconURL: location.protocol+"//"+location.host+'/yammer-dm.png',
+	contentPanel: location.protocol+"//"+location.host+"/private_msg.htm"
+      });
+      postAPIMessage('social.ambient-notification', {
+	name: "unseen_notification_count",
+	counter: msg.data.unseen_notification_count,
+	iconURL: location.protocol+"//"+location.host+'/yammer-dm.png',
+	contentPanel: location.protocol+"//"+location.host+"/notifications.htm"
+      });
 
+    }
   }
 }
 
-function initializeAmbientNotifications() {
-
-  postAPIMessage('social.ambient-notification', {
-    name: "private-msg",
-    counter: 2,
-    iconURL: '/yammerer/yammer-dm.png',
-    contentPanel: "/yammerer/private_msg.htm"
-  });
-
-  postAPIMessage('social.ambient-notification', {
-    name: "network-update",
-    counter: 1,
-    background: '/yammerer/yammer-net.png', 
-    contentPanel: "/yammerer/network_update.htm"
-  });
-
-}

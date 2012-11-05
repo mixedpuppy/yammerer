@@ -1,25 +1,44 @@
-<!DOCTYPE HTML> <html> <head></head> <body>
-<script data-app-id="GXdkYWYvuC1lAD8RUESKw" src="https://assets.yammer.com/platform/yam.js"></script>
-<script> yam.connect.embedFeed(
-{ container: '#embedded-feed'
-, network: 'yammerdevelopersnetwork',
-feedType: 'in_thread', threadId: 227464019
-});
+<!DOCTYPE HTML> <html> <head>
+  <link href="bootstrap/css/bootstrap.css" rel="stylesheet">
 
+  <script src="http://code.jquery.com/jquery-latest.js"></script>
+  <script src="bootstrap/js/bootstrap.min.js"></script>
+  <script data-app-id="GXdkYWYvuC1lAD8RUESKw" src="https://assets.yammer.com/platform/yam.js"></script>
+<script>
+
+var currentNetwork = 'yammerdevelopersnetwork';
+yam.connect.embedFeed({ container: '#embedded-feed', network: currentNetwork, threadId: 227538685});
+
+// yam.api.getUsersFollowing({data: {id: myuser.id}, success: function(r) { testresp=r }})
+// yam.api.getNetworks({data: {id: myuser.id}, success: function(r) {testresp=r}});
 // /api/v1/streams/notifications?count=3&mark_seen=false
 var currentUser = null;
+var networks = null;
 function theYamMonitor() {
   yam.request({
     url: "/api/v1/networks/current.json",
     success: function(resp) {
+      var port = navigator.mozSocial.getWorker().port;
       var user = yam.getCurrentUser();
       if (!currentUser || user.id != currentUser.id) {
         currentUser = user;
+
         //dump("****** getCurrentNetwork "+yam.getCurrentNetwork()+"\n");
-        navigator.mozSocial.getWorker().port.postMessage(
-          {topic: "yam.currentUser", data: user}
-        );
+        port.postMessage({topic: "yam.currentUser", data: user});
+
+
       }
+
+      // getNetworks
+      yam.api.getNetworks({data: {id: currentUser.id}, success: function(r) {
+        networks = r;
+        for (var i=0; i<r.length; i++) {
+          if (r[i].permalink == currentNetwork) {
+            port.postMessage({topic: "yam.currentNetwork", data: r[i]});
+          }
+        }
+      }});
+
     },
     error: function(resp) {
       if (resp.status == 429) // not sure what this is, but it is not logged out
@@ -33,11 +52,29 @@ function theYamMonitor() {
       //dump("****** current "+JSON.stringify(resp)+"\n");
     }
   });
+  
+  if (currentUser) {
+  }
 }
 
 window.setInterval(theYamMonitor, 1000);
 
+function change(network, threadId) {
+  yam.connect.embedFeed({ container: '#embedded-feed', network: network, threadId: threadId});
+}
 </script>
+</head> <body>
+
+  <!--
+    <div class="btn-group">
+      <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+      Networks
+      <span class="caret"></span>
+      </a>
+      <ul class="dropdown-menu"></ul>
+    </div>
+  -->
 <div id="embedded-feed"></div>
+
 </body>
 </html>

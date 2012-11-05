@@ -1,0 +1,58 @@
+<!DOCTYPE HTML> <html> <head>
+  <link href="bootstrap/css/bootstrap.css" rel="stylesheet">
+
+  <script src="http://code.jquery.com/jquery-latest.js"></script>
+  <script src="bootstrap/js/bootstrap.min.js"></script>
+  <script data-app-id="GXdkYWYvuC1lAD8RUESKw" src="https://assets.yammer.com/platform/yam.js"></script>
+<script>
+
+
+// yam.api.getUsersFollowing({data: {id: myuser.id}, success: function(r) { testresp=r }})
+// yam.api.getNetworks({data: {id: myuser.id}, success: function(r) {testresp=r}});
+// /api/v1/streams/notifications?count=3&mark_seen=false
+window.addEventListener("socialFrameShow", function(e) {
+
+yam.request({url: "/api/v1/streams/notifications",
+  success: function(resp) {
+    dump("!!!!!! get notifications success\n");
+    var port = navigator.mozSocial.getWorker().port;
+    dump(JSON.stringify(resp)+"\n");
+  },
+  error: function(resp) {
+    dump("!!!!!! get notifications error\n");
+  },
+  complete: function(resp) {
+    dump("****** complete "+JSON.stringify(resp)+"\n");
+  }
+});
+
+}, false);
+
+</script>
+
+</head> <body>
+
+<span id="yammer-login"></span>
+<script> yam.connect.loginButton('#yammer-login', function (resp) {
+  if (resp.authResponse) {
+  document.getElementById('yammer-login').innerHTML = 'Welcome to Yammer!';
+
+yam.request({url: "/api/v1/streams/notifications",
+  success: function(resp) {
+    dump("!!!!!! get notifications success\n");
+    var port = navigator.mozSocial.getWorker().port;
+    dump(JSON.stringify(resp)+"\n");
+  },
+  error: function(resp) {
+    dump("!!!!!! get notifications error\n");
+  },
+  complete: function(resp) {
+    dump("****** complete "+JSON.stringify(resp)+"\n");
+  }
+});
+    }
+  });
+</script>
+<dl id="msg"></dl>
+</body>
+</html>
