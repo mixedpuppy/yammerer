@@ -5,9 +5,7 @@
   <script src="bootstrap/js/bootstrap.min.js"></script>
   <script data-app-id="GXdkYWYvuC1lAD8RUESKw" src="https://assets.yammer.com/platform/yam.js"></script>
 <script>
-
-var currentNetwork = 'yammerdevelopersnetwork';
-yam.connect.embedFeed({ container: '#embedded-feed', network: currentNetwork, threadId: 227538685});
+var currentNetwork = location.hash ? location.hash.substr(1) : 'yammerdevelopersnetwork';
 
 // yam.api.getUsersFollowing({data: {id: myuser.id}, success: function(r) { testresp=r }})
 // yam.api.getNetworks({data: {id: myuser.id}, success: function(r) {testresp=r}});
@@ -32,10 +30,18 @@ function theYamMonitor() {
       // getNetworks
       yam.api.getNetworks({data: {id: currentUser.id}, success: function(r) {
         networks = r;
+        $(".dropdown-menu").empty();
         for (var i=0; i<r.length; i++) {
           if (r[i].permalink == currentNetwork) {
             port.postMessage({topic: "yam.currentNetwork", data: r[i]});
           }
+          var a = $("<a href='#"+r[i].permalink+"'>"+r[i].permalink+"</a>").click(function() {
+            dump("***** switch to "+$(this).attr('href')+"\n");
+            //change($(this).attr('href').substr(1));
+            location.hash = $(this).attr('href');
+            setTimeout(function() {location.reload()}, 10);
+          });
+          $(".dropdown-menu").append("<li/>").append(a);
         }
       }});
 
@@ -52,7 +58,7 @@ function theYamMonitor() {
       //dump("****** current "+JSON.stringify(resp)+"\n");
     }
   });
-  
+
   if (currentUser) {
   }
 }
@@ -60,20 +66,24 @@ function theYamMonitor() {
 window.setInterval(theYamMonitor, 1000);
 
 function change(network, threadId) {
-  yam.connect.embedFeed({ container: '#embedded-feed', network: network, threadId: threadId});
+  dump("load network "+network+"\n");
+  yam.connect.embedFeed({ container: '#embedded-feed', network: network});
+}
+
+function onload() {
+  change(currentNetwork);
 }
 </script>
-</head> <body>
+</head> <body onload="onload()">
 
-  <!--
-    <div class="btn-group">
-      <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
-      Networks
-      <span class="caret"></span>
-      </a>
-      <ul class="dropdown-menu"></ul>
-    </div>
-  -->
+<div class="btn-group">
+  <button type="button" class="btn" onclick="location.reload()">reload</button>
+  <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+  Networks
+  <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu"></ul>
+</div>
 <div id="embedded-feed"></div>
 
 </body>

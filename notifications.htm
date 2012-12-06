@@ -41,13 +41,13 @@ yam.request({url: "/api/v1/streams/notifications",
   success: function(resp) {
     dump("!!!!!! get notifications success\n");
     var port = navigator.mozSocial.getWorker().port;
-    dump(JSON.stringify(resp)+"\n");
+    //dump(JSON.stringify(resp)+"\n");
   },
   error: function(resp) {
     dump("!!!!!! get notifications error\n");
   },
   complete: function(resp) {
-    dump("****** complete "+JSON.stringify(resp)+"\n");
+    //dump("****** complete "+JSON.stringify(resp)+"\n");
   }
 });
     }
